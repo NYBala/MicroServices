@@ -1,15 +1,11 @@
 package com.cognizant.cde.learning.micro;
 
+import com.cognizant.cde.learning.micro.service.SimpleService;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.*;
 
 @Controller("/")
 public class SimpleController {
-
-    public static final String SECRET_KEY = "tnazingoc";
 
     @Get("/hello")
     @Produces(MediaType.TEXT_PLAIN)
@@ -17,19 +13,22 @@ public class SimpleController {
         return "Hello World";
     }
 
-    @Post("/encrypt")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Get(value = "/encrypt", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
     public String encrypt() {
-        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
-        String privateData = "secret-data";
-        textEncryptor.setPasswordCharArray(SECRET_KEY.toCharArray());
-
-        return "Encrypt";
+        long start = System.currentTimeMillis();
+        String encrypted = "Failed Encryption";
+        try {
+            SimpleService service = new SimpleService();
+            encrypted = service.execute();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Internal Time Taken: " + (end-start));
+        return encrypted;
     }
 
-    @Post("/decrypt")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String decrypt() {
-        return "Decrypt";
-    }
+
+
+
 }
